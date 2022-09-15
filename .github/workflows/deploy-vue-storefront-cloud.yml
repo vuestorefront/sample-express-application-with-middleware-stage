@@ -31,6 +31,22 @@ jobs:
           NPM_USER: ${{ secrets.NPM_USER }}
           NPM_REGISTRY: "https://registrynpm.storefrontcloud.io"
 
+      - name: Build and publish docker image (middleware)
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: ${{ secrets.PROJECT_NAME }}-storefrontcloud-io/vue-storefront-middleware:${{ github.sha }}
+          registry: ${{ secrets.DOCKER_REGISTRY_URL || 'registry.vuestorefront.cloud' }}
+          username: ${{ secrets.CLOUD_USERNAME }}
+          password: ${{ secrets.CLOUD_PASSWORD }}
+          dockerfile: .vuestorefrontcloud/docker/middleware.Dockerfile
+          buildoptions: "--compress"
+          buildargs: NPM_EMAIL,NPM_PASS,NPM_USER,NPM_REGISTRY
+        env:
+          NPM_EMAIL: ${{ secrets.NPM_EMAIL }}
+          NPM_PASS: ${{ secrets.NPM_PASS }}
+          NPM_USER: ${{ secrets.NPM_USER }}
+          NPM_REGISTRY: "https://registrynpm.storefrontcloud.io"
+
   deploy:
     runs-on: ubuntu-latest
     permissions:
@@ -50,6 +66,15 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           curl --location --request PATCH '${{ secrets.PLATFORM_API_URL || 'https://api.platform.vuestorefront.io' }}/cloud/instances/${{ secrets.PROJECT_NAME }}-${{ secrets.CLOUD_REGION }}-gcp-storefrontcloud-io/deploy' --header 'Content-Type: application/json' --data-raw '{ "cloudUserId": "${{ secrets.CLOUD_USERNAME }}", "cloudUserPassword": "${{ secrets.CLOUD_PASSWORD }}", "dockerImageHash": "${{ github.sha }}"}'
+
+      - name: Deploy middleware on ${{ secrets.PROJECT_NAME }}.${{ secrets.CLOUD_REGION }}.gcp.storefrontcloud.io/middleware
+        run: |
+          if curl -s -H 'X-User-Id: ${{ secrets.CLOUD_USERNAME }}'  -H 'X-Api-Key: ${{ secrets.CLOUD_PASSWORD }}' -H 'Content-Type: application/json' -X POST -d '{"code":"${{ secrets.PROJECT_NAME }}-${{ secrets.CLOUD_REGION }}-storefrontcloud-io","region":"${{ secrets.CLOUD_REGION }}","additionalApps":{"apps":[{"name":"middleware","tag":"${{ github.sha }}","image":"${{ secrets.DOCKER_REGISTRY_URL || 'registry.vuestorefront.cloud' }}/${{ secrets.PROJECT_NAME }}-vue-storefront-middleware","path":"/api/","port":"8181"}]}}' https://farmer.storefrontcloud.io/instances | grep -q '{"code":200,"result":"Instance updated!"}'; then
+            echo "Instance updated"
+          else
+            echo "Something went wrong during the update process..."
+            exit 1
+          fi
 
       - name: Update deployment status (success)
         if: success()
