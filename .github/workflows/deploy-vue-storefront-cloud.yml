@@ -82,7 +82,7 @@ jobs:
               }],
               "enabled": true
               }
-            }' ${{ secrets.CLOUD_API_BASE_URL || 'https://farmer.storefrontcloud.io' }}/instance/${{ secrets.PROJECT_NAME }}-${{ secrets.CLOUD_REGION }}-gcp-storefrontcloud-io; then
+            }' ${{ secrets.CLOUD_API_BASE_URL || 'https://farmer.vuestorefront.cloud' }}/instance/${{ secrets.PROJECT_NAME }}-${{ secrets.CLOUD_REGION }}-gcp-storefrontcloud-io; then
             echo "Instance updated"
           else
             echo "Something went wrong during the update process..."
