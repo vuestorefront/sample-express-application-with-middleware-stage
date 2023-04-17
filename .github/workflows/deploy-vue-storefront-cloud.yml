@@ -55,7 +55,7 @@ jobs:
     - name: Deploy App
       uses: fjogeleit/http-request-action@v1
       with:
-        url: '${{ secrets.PLATFORM_API_URL }}/cloud/instances/${{ secrets.PROJECT_NAME }}-${{ secrets.CLOUD_REGION }}-gcp-storefrontcloud-io/deploy'
+        url: '${{ secrets.CONSOLE_API_URL }}/cloud/instances/${{ secrets.PROJECT_NAME }}-${{ secrets.CLOUD_REGION }}-gcp-storefrontcloud-io/deploy'
         method: 'PATCH'
         customHeaders: '{"Content-Type":"application/json"}'
         data: '{ "cloudUserId": "${{ secrets.CLOUD_USERNAME }}", "cloudUserPassword": "${{ secrets.CLOUD_PASSWORD }}", "dockerImageHash": "${{ github.sha }}" }'
@@ -63,7 +63,7 @@ jobs:
     - name: Deploy Middleware
       uses: fjogeleit/http-request-action@v1
       with:
-        url: '${{ secrets.PLATFORM_API_URL }}/cloud/instances/${{ secrets.PROJECT_NAME }}-${{ secrets.CLOUD_REGION }}-gcp-storefrontcloud-io/deploy'
+        url: '${{ secrets.CONSOLE_API_URL }}/cloud/instances/${{ secrets.PROJECT_NAME }}-${{ secrets.CLOUD_REGION }}-gcp-storefrontcloud-io/deploy'
         method: 'PATCH'
         customHeaders: '{"Content-Type":"application/json"}'
         data: '{ "middleware":true, "cloudUserId":"${{ secrets.CLOUD_USERNAME }}", "cloudUserPassword":"${{ secrets.CLOUD_PASSWORD }}", "dockerImageHash":"${{ github.sha }}", "middlewareData":{ "path":"/api/", "port":3000, "has_base_path":false } }'
